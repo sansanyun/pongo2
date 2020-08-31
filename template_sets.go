@@ -209,7 +209,7 @@ func (set *TemplateSet) FromBytes(tpl []byte) (*Template, error) {
 }
 
 // FromFile loads a template from a filename and returns a Template instance.
-func (set *TemplateSet) FromFile(filename string) (*Template, error) {
+func (set *TemplateSet) FromFile(filename string,fx func(buf []byte) []byte) (*Template, error) {
 	set.firstTemplateCreated = true
 
 	_, _, fd, err := set.resolveTemplate(nil, filename)
@@ -228,7 +228,7 @@ func (set *TemplateSet) FromFile(filename string) (*Template, error) {
 			OrigError: err,
 		}
 	}
-
+	buf = fx(buf)
 	return newTemplate(set, filename, false, buf)
 }
 

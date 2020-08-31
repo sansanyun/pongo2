@@ -58,7 +58,6 @@ func newTemplateString(set *TemplateSet, tpl []byte) (*Template, error) {
 
 func newTemplate(set *TemplateSet, name string, isTplString bool, tpl []byte) (*Template, error) {
 	strTpl := string(tpl)
-
 	// Create the template
 	t := &Template{
 		set:            set,
