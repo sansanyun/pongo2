@@ -209,7 +209,7 @@ func (set *TemplateSet) FromBytes(tpl []byte) (*Template, error) {
 }
 
 // FromFile loads a template from a filename and returns a Template instance.
-func (set *TemplateSet) FromFile(filename string,fx func(buf []byte) []byte) (*Template, error) {
+func (set *TemplateSet) FromFunFile(filename string,fx func(buf []byte) []byte) (*Template, error) {
 	set.firstTemplateCreated = true
 
 	_, _, fd, err := set.resolveTemplate(nil, filename)
@@ -229,6 +229,29 @@ func (set *TemplateSet) FromFile(filename string,fx func(buf []byte) []byte) (*T
 		}
 	}
 	buf = fx(buf)
+	return newTemplate(set, filename, false, buf)
+}
+
+// FromFile loads a template from a filename and returns a Template instance.
+func (set *TemplateSet) FromFile(filename string) (*Template, error) {
+	set.firstTemplateCreated = true
+
+	_, _, fd, err := set.resolveTemplate(nil, filename)
+	if err != nil {
+		return nil, &Error{
+			Filename:  filename,
+			Sender:    "fromfile",
+			OrigError: err,
+		}
+	}
+	buf, err := ioutil.ReadAll(fd)
+	if err != nil {
+		return nil, &Error{
+			Filename:  filename,
+			Sender:    "fromfile",
+			OrigError: err,
+		}
+	}
 	return newTemplate(set, filename, false, buf)
 }
 
@@ -296,6 +319,7 @@ var (
 	FromString           = DefaultSet.FromString
 	FromBytes            = DefaultSet.FromBytes
 	FromFile             = DefaultSet.FromFile
+	FromFunFile             = DefaultSet.FromFunFile
 	FromCache            = DefaultSet.FromCache
 	RenderTemplateString = DefaultSet.RenderTemplateString
 	RenderTemplateFile   = DefaultSet.RenderTemplateFile
